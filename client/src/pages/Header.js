@@ -1,7 +1,35 @@
-import React from "react";
+import React, { useContext } from "react";
 import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
 import Logo from "../imgs/LogoSquare.png";
+import { UserContext } from "../UserContext";
+
 const Header = () => {
+  // const [username, setUsername] = useState(null);
+
+  const { setUserInfo, userInfo } = useContext(UserContext);
+
+  useEffect(() => {
+    fetch("http://localhost:4000/profile", {
+      credentials: "include",
+    }).then((response) => {
+      response.json().then((userInfo) => {
+        // setUsername(userInfo.username);
+        setUserInfo(userInfo);
+      });
+    });
+  });
+
+  function logout() {
+    fetch("http://localhost:4000/logout", {
+      credentials: "include",
+      method: "POST",
+    });
+    setUserInfo(null);
+  }
+
+  const username = userInfo?.username;
+
   return (
     <>
       <header>
@@ -60,16 +88,34 @@ const Header = () => {
                   Blog
                 </Link>
               </li>
-              <li className="nav-item">
-                <Link className="nav-link" to="/login">
-                  Login
-                </Link>
-              </li>
-              <li className="nav-item">
-                <Link className="nav-link" to="/register">
-                  Register
-                </Link>
-              </li>
+              {username && (
+                <>
+                  <li className="nav-item">
+                    <Link className="nav-link" to="/create">
+                      Dashboard
+                    </Link>
+                  </li>{" "}
+                  <li className="nav-item">
+                    <Link className="nav-link" to="" onClick={logout}>
+                      Signout
+                    </Link>
+                  </li>
+                </>
+              )}
+              {!username && (
+                <>
+                  <li className="nav-item">
+                    <Link className="nav-link" to="/login">
+                      Login
+                    </Link>
+                  </li>
+                  <li className="nav-item">
+                    <Link className="nav-link" to="/register">
+                      Register
+                    </Link>
+                  </li>
+                </>
+              )}
             </ul>
           </div>
         </nav>
